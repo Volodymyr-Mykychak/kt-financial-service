@@ -41,7 +41,11 @@ class FinancialService {
         currencyCode: CurrencyCode,
         transactionId: TransactionId
     ): String {
-        return "Transferred ${amount.amount} ${currencyCode.code} from ${source.value} to ${destination.value}. Transaction ID: ${transactionId.id}"
+        val amountInfo = "${amount.amount} ${currencyCode.code}"
+        val accountsInfo = "from ${source.value} to ${destination.value}"
+        val transactionInfo = "Transaction ID: ${transactionId.id}"
+
+        return "Transferred $amountInfo $accountsInfo. $transactionInfo"
     }
 
     fun convertCurrency(

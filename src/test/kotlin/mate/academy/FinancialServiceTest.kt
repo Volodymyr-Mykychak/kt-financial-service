@@ -1,14 +1,12 @@
 package mate.academy
 
-private const val USD_TO_EUR_RATE = 0.93
-private const val USD_TO_GBP_RATE = 0.82
-private const val ACCOUNT_NUMBER_LENGTH = 10
-private const val CURRENCY_CODE_REGEX = "[A-Z]{3}"
+const val GBP = 0.82
+const val EUR = 0.93
 
 @JvmInline
-value class AccountNumber(val value: String) {
+value class AccountNumber(val accountNumber: String) {
     init {
-        require(value.length == ACCOUNT_NUMBER_LENGTH && value.all { it.isDigit() })
+        require(accountNumber.matches(Regex("\\d{10}")))
     }
 }
 
@@ -22,14 +20,14 @@ value class CurrencyAmount(val amount: Double) {
 @JvmInline
 value class CurrencyCode(val code: String) {
     init {
-        require(code.matches(Regex(CURRENCY_CODE_REGEX)))
+        require(code.matches(Regex("[A-Z]{3}")))
     }
 }
 
 @JvmInline
-value class TransactionId(val id: String) {
+value class TransactionId(val transactionId: String) {
     init {
-        require(id.isNotEmpty())
+        require(transactionId.isNotEmpty())
     }
 }
 
@@ -40,10 +38,10 @@ class FinancialService {
         amount: CurrencyAmount,
         currencyCode: CurrencyCode,
         transactionId: TransactionId
-    ): String {
+    ) : String {
         return "Transferred ${amount.amount} ${currencyCode.code} " +
-                "from ${source.value} to ${destination.value}. " +
-                "Transaction ID: ${transactionId.id}"
+                "from ${source.accountNumber} to ${destination.accountNumber}. " +
+                "Transaction ID: ${transactionId.transactionId}"
     }
 
     fun convertCurrency(
@@ -51,14 +49,15 @@ class FinancialService {
         fromCurrency: CurrencyCode,
         toCurrency: CurrencyCode
     ): CurrencyAmount {
-        val rate = getExchangeRate(fromCurrency, toCurrency)
-        return CurrencyAmount(amount.amount * rate)
+        val exchangeRate = getExchangeRate(fromCurrency, toCurrency)
+        return CurrencyAmount(amount.amount * exchangeRate)
     }
 
     private fun getExchangeRate(fromCurrency: CurrencyCode, toCurrency: CurrencyCode): Double {
-        return when (fromCurrency.code to toCurrency.code) {
-            "USD" to "EUR" -> USD_TO_EUR_RATE
-            "USD" to "GBP" -> USD_TO_GBP_RATE
+        // Placeholder exchange rate - in a real application, you'd fetch this from a financial API
+        return when {
+            fromCurrency.code == "USD" && toCurrency.code == "EUR" -> EUR
+            fromCurrency.code == "USD" && toCurrency.code == "GBP" -> GBP
             else -> 1.0
         }
     }
